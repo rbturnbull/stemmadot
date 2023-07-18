@@ -8,17 +8,15 @@ app = typer.Typer()
 
 def fix_inward(node, source, output, visited=None):
     visited = visited or []
-    print('node', node)
     visited.append(node)
     for edge in source.in_edges(node):
         color = source.edges[edge].get("color", "black")
         if edge[0] == node:
             n = edge[1]
-            print("BAD")
         elif edge[1] == node:
             n = edge[0]
         else:
-            print("PAIN")
+            raise Exception("Problem reading edge.")
         
         if not output.has_edge(node, n) and not output.has_edge(n, node):
             output.add_edge(node, n)
@@ -30,18 +28,16 @@ def fix_inward(node, source, output, visited=None):
 
 def fix_outward(node, source, output, visited=None):
     visited = visited or []
-    print('fix_outward node', node)
     visited.append(node)
     edges = list(source.in_edges(node)) + list(source.out_edges(node))
     for edge in edges:
-        print(edge)
         color = source.edges[edge].get("color", "black")
         if edge[0] == node:
             n = edge[1]
         elif edge[1] == node:
             n = edge[0]
         else:
-            print("PAIN")
+            raise Exception("Problem reading edge.")
         
         if not output.has_edge(node, n) and not output.has_edge(n, node):
             output.add_edge(edge[0], edge[1])

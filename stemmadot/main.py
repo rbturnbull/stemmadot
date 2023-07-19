@@ -6,7 +6,7 @@ import networkx as nx
 app = typer.Typer()
 
 
-def fix_inward(node, source, output, visited=None):
+def reroot_inward(node, source, output, visited=None):
     visited = visited or []
     visited.append(node)
     for edge in source.in_edges(node):
@@ -23,10 +23,10 @@ def fix_inward(node, source, output, visited=None):
             output.edges[node, n]["color"] = color            
 
         if n not in visited:
-            fix_inward(n, source, output, visited)
+            reroot_inward(n, source, output, visited)
 
 
-def fix_outward(node, source, output, visited=None):
+def reroot_outward(node, source, output, visited=None):
     visited = visited or []
     visited.append(node)
     edges = list(source.in_edges(node)) + list(source.out_edges(node))
@@ -44,7 +44,7 @@ def fix_outward(node, source, output, visited=None):
             output.edges[edge[0], edge[1]]["color"] = color
 
         if n not in visited:
-            fix_outward(n, source, output, visited)
+            reroot_outward(n, source, output, visited)
 
 
 # def reroot(source, node, output=None, visited=None):
@@ -78,7 +78,9 @@ def to_dot(
     stem_file: Path, 
     dot_file:Path, 
     root: str = None,
-    mixture_color: str = "red",
+    mixture_edge_color: str = "red",
+    root_color: str = "red",
+    hypothetical_node_color: str = "gray",
 ):
     graph = nx.DiGraph()
 
@@ -90,17 +92,28 @@ def to_dot(
                 end = m.group(3)
                 graph.add_edge(start, end)
                 if m.group(2) == "=":
-                    graph.edges[start, end]['color'] = mixture_color
+                    graph.edges[start, end]['color'] = mixture_edge_color
 
 
     # Create a new graph that is rooted at the first node
     if root:
         rerooted = nx.DiGraph()
-        fix_inward(root, graph, rerooted)
-        fix_outward(root, graph, rerooted)    
+        reroot_inward(root, graph, rerooted)
+        reroot_outward(root, graph, rerooted)    
         graph = rerooted    
 
     # TODO Colorize the nodes
+    for node in graph.nodes:
+        rerooted.nodes[node]["label"] = node                            
+        if node.startswith("["):
+            rerooted.nodes[node]["color"] = hypothetical_node_color
+            rerooted.nodes[node]["label"] = ""    
+            rerooted.nodes[node]["shape"] = "circle"
+            rerooted.nodes[node]["fixedsize"] = "true"
+            rerooted.nodes[node]["style"] = "filled"
+            rerooted.nodes[node]["fillcolor"] = hypothetical_node_color
+        elif node == root:
+            rerooted.nodes[node]["color"] = root_color
 
     # Write the graph to a .dot file
     nx.drawing.nx_pydot.write_dot(graph, dot_file)

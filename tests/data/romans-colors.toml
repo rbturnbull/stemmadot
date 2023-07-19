@@ -1,0 +1,51 @@
+# Lectionaries
+"L.*" = "blue"
+# 8079
+0150K = "red"
+2110K = "red"
+# 6209
+606K = "orange"
+1963K = "orange"
+1996K = "orange"
+1999K = "orange"
+2012K = "orange"
+# C161
+1909K = "green"
+# C165.a                        
+441K = "cyan"
+1908K = "cyan"
+# C165.e
+424K = "purple"
+621K = "purple"
+# C167
+"103K" = "yellow"
+"455K" = "yellow"
+"608K" = "yellow"
+"886K" = "yellow"
+"1524K" = "yellow"
+"1798K" = "yellow"
+"1935K" = "yellow"
+"1947K" = "yellow"
+"1950K" = "yellow"
+"1961K" = "yellow"
+"1973K" = "yellow"
+"1985K" = "yellow"
+"1987K" = "yellow"
+"1987SK" = "yellow"
+"1991K" = "yellow"
+"1991S1K" = "yellow"
+"1991S2K" = "yellow"
+"1995K" = "yellow"
+"2000K" = "yellow"
+"2102K" = "yellow"
+"2105K" = "yellow"
+"2197K" = "yellow"
+"2576K" = "yellow"
+"2659K" = "yellow"
+# Chrysostom 
+623K = "navy"
+1942K = "navy"
+1962K = "navy"
+
+1739K = "grey"
+".*K$" = "green"

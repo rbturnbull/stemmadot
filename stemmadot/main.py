@@ -57,8 +57,8 @@ def to_dot(
     root_color: str = "red",
     hypothetical_node_color: str = "gray",
     colors: Path = None,
-    dotted_percentage: int = 33,
-    dashed_percentage: int = 67,
+    dotted: int = 33,
+    dashed: int = 67,
 ):
     graph = nx.DiGraph()
 
@@ -119,9 +119,9 @@ def to_dot(
                     start, percentage = link.split("=")
                     graph.edges[start, mixed_node]["label"] = percentage
                     percentage_int = int(percentage[:-1])
-                    if percentage_int < dotted_percentage:
+                    if percentage_int < dotted:
                         style = "dotted"
-                    elif percentage_int < dashed_percentage:
+                    elif percentage_int < dashed:
                         style = "dashed"
                     else:
                         style = "solid"

@@ -72,6 +72,8 @@ The root will be colored red by default and you can specify the color of other n
 
 Hypothetical nodes will be colored gray by default and you can specify the color of other nodes using the `--hypothetical-node-color` option:
 
+.. code-block:: bash
+
     stemmadot <stemfile> <outputfile> --hypothetical-node-color <color>
 
 You can specify other colors for nodes by creating a `.toml` file with regex patterns as keys and the corresponding colors as values:
@@ -96,6 +98,10 @@ This is given to stemmadot using the `--colors` option:
 
     stemmadot <stemfile> <outputfile>
 
+Edges representing mixutre (i.e. or 'contamination') will be colored red by default and you can specify the color of other edges using the `--mixture-edge-color` option.
+Also, mixture with less than 33% will show in dotted lines and mixture with less than 66% will show in dashed lines. These can be changed with the `--dotted` and `--dashed` options respectively.
+
+
 Credits
 ==================================
 
@@ -104,7 +110,9 @@ Credits
 Robert Turnbull
 For more information contact: <robert.turnbull@unimelb.edu.au>
 
-Created using torchapp (https://github.com/rbturnbull/torchapp).
+STEMMA was created by Stephen Carlson (Australian Catholic University).
+
+Help for this project came from Peter Montoro.
 
 .. end-credits
 

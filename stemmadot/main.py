@@ -20,8 +20,12 @@ def reroot_inward(node, source, output, visited=None):
             raise Exception("Problem reading edge.")
         
         if not output.has_edge(node, n) and not output.has_edge(n, node):
-            output.add_edge(node, n)
-            output.edges[node, n]["color"] = color            
+            if n in visited:
+                edge = (n, node)
+            else:
+                edge = (node, n)
+            output.add_edge(*edge)
+            output.edges[*edge]["color"] = color            
 
         if n not in visited:
             reroot_inward(n, source, output, visited)
@@ -79,6 +83,32 @@ def to_dot(
         reroot_outward(root, graph, rerooted)    
         graph = rerooted    
 
+    # Read input file again to get the mixed nodes and their percentages
+    mixed_node = None
+    with open(stem_file) as f:
+        for line in f:
+            if m := re.match(r"Mixed Node\s(.*?)\s", line):
+                mixed_node = m.group(1)
+            elif m:= re.match(r"Mixed %ages: (.*)$", line):
+                for link in m.group(1).split():
+                    start, percentage = link.split("=")
+                    edge = (start, mixed_node)
+                    if not edge in graph.edges:
+                        edge = (mixed_node, start)
+
+                    if not edge in graph.edges:
+                        raise Exception(f"edge not found: {start} {mixed_node}")
+
+                    graph.edges[edge]["label"] = percentage
+                    percentage_int = int(percentage[:-1])
+                    if percentage_int < dotted:
+                        style = "dotted"
+                    elif percentage_int < dashed:
+                        style = "dashed"
+                    else:
+                        style = "solid"
+                    graph.edges[edge]["style"] = style
+
     # Parse colors file
     colors_dict = {}
     if colors:
@@ -95,7 +125,7 @@ def to_dot(
         graph.nodes[node]["label"] = node                            
         if node.startswith("["):
             graph.nodes[node]["color"] = hypothetical_node_color
-            graph.nodes[node]["label"] = ""    
+            # graph.nodes[node]["label"] = ""    
             graph.nodes[node]["shape"] = "circle"
             graph.nodes[node]["fixedsize"] = "true"
             graph.nodes[node]["style"] = "filled"
@@ -107,25 +137,6 @@ def to_dot(
             if re.match(pattern, node):
                 graph.nodes[node]["color"] = color
                 break # only use first match
-
-    # Read input file again to get the mixed nodes and their percentages
-    mixed_node = None
-    with open(stem_file) as f:
-        for line in f:
-            if m := re.match(r"Mixed Node\s(.*?)\s", line):
-                mixed_node = m.group(1)
-            elif m:= re.match(r"Mixed %ages: (.*)$", line):
-                for link in m.group(1).split():
-                    start, percentage = link.split("=")
-                    graph.edges[start, mixed_node]["label"] = percentage
-                    percentage_int = int(percentage[:-1])
-                    if percentage_int < dotted:
-                        style = "dotted"
-                    elif percentage_int < dashed:
-                        style = "dashed"
-                    else:
-                        style = "solid"
-                    graph.edges[start, mixed_node]["style"] = style
 
     # Write the graph to a .dot file
     nx.drawing.nx_pydot.write_dot(graph, dot_file)

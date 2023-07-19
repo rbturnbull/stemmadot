@@ -25,7 +25,7 @@ def reroot_inward(node, source, output, visited=None):
             else:
                 edge = (node, n)
             output.add_edge(*edge)
-            output.edges[*edge]["color"] = color            
+            output.edges[edge[0], edge[1]]["color"] = color            
 
         if n not in visited:
             reroot_inward(n, source, output, visited)

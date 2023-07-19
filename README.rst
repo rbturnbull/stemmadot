@@ -27,6 +27,14 @@ stemmadot
 
 Visualization of STEMMA phylogenetic output.
 
+STEMMA is a phylogenetic analysis tool for the study of textual traditions with contamination. 
+It is available here: https://github.com/stemmatic/stemma
+STEMMA input files can be generated from TEI XML using teiphy: https://github.com/jjmccollum/teiphy
+
+For more information see: 
+Joey McCollum and Robert Turnbull, "teiphy: A Python Package for Converting TEI XML Collations to NEXUS and Other Formats," JOSS 7.80 (2022): 4879, DOI: 10.21105/joss.04879.
+
+
 Installation
 ==================================
 
@@ -40,20 +48,53 @@ Install using pip:
 Usage
 ==================================
 
-See the options for training a model with the command:
+Create the .STEM file using the `soln` executable from STEMMA.
+
+Then run stemmadot:
 
 .. code-block:: bash
 
-    stemmadot train --help
+    stemmadot <stemfile> <outputfile>
 
-See the options for making inferences with the command:
+This will create a .dot file which can be visualized using Graphviz.
+
+You can reroot the tree using the `--root` option:
 
 .. code-block:: bash
 
-    stemmadot infer --help
+    stemmadot <stemfile> <outputfile> --root <root>
 
-.. end-quickstart
+The root will be colored red by default and you can specify the color of other nodes using the `--root-color` option:
 
+.. code-block:: bash
+
+    stemmadot <stemfile> <outputfile> --root <root> --root-color <color>
+
+Hypothetical nodes will be colored gray by default and you can specify the color of other nodes using the `--hypothetical-node-color` option:
+
+    stemmadot <stemfile> <outputfile> --hypothetical-node-color <color>
+
+You can specify other colors for nodes by creating a `.toml` file with regex patterns as keys and the corresponding colors as values:
+
+.. code-block:: toml
+
+    # Lectionaries
+    "L.*" = "blue"
+    # 8079
+    0150K = "red"
+    2110K = "red"
+    # 6209
+    606K = "orange"
+    1963K = "orange"
+    1996K = "orange"
+    1999K = "orange"
+    2012K = "orange"
+
+This is given to stemmadot using the `--colors` option:
+
+.. code-block:: bash
+
+    stemmadot <stemfile> <outputfile>
 
 Credits
 ==================================

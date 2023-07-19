@@ -125,7 +125,7 @@ def to_dot(
         graph.nodes[node]["label"] = node                            
         if node.startswith("["):
             graph.nodes[node]["color"] = hypothetical_node_color
-            # graph.nodes[node]["label"] = ""    
+            graph.nodes[node]["label"] = ""    
             graph.nodes[node]["shape"] = "circle"
             graph.nodes[node]["fixedsize"] = "true"
             graph.nodes[node]["style"] = "filled"

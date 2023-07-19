@@ -106,6 +106,7 @@ def to_dot(
         for pattern, color in colors_dict.items():
             if re.match(pattern, node):
                 graph.nodes[node]["color"] = color
+                break # only use first match
 
     # Read input file again to get the mixed nodes and their percentages
     mixed_node = None

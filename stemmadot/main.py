@@ -47,32 +47,6 @@ def reroot_outward(node, source, output, visited=None):
             reroot_outward(n, source, output, visited)
 
 
-# def reroot(source, node, output=None, visited=None):
-#     output = output or nx.DiGraph()
-#     breakpoint()
-
-#     visited = visited or []
-#     visited.append(node)
-#     for edge in source.edges(node):
-#         color = source.edges[edge].get("color", "black")
-#         if edge[0] == node:
-#             n = edge[1]
-#         elif edge[1] == node:
-#             n = edge[0]
-#         else:
-#             raise Exception("Problem reading edge.")
-        
-#         needs_rooting = n not in visited
-#         if not output.has_edge(node, n) and not output.has_edge(n, node):
-#             output.add_edge(node, n)
-#             output.edges[node, n]["color"] = color
-        
-#         if needs_rooting:
-#             reroot(source, n, output, visited)
-
-#     return output
-
-
 @app.command()
 def to_dot(
     stem_file: Path, 
@@ -81,6 +55,8 @@ def to_dot(
     mixture_edge_color: str = "red",
     root_color: str = "red",
     hypothetical_node_color: str = "gray",
+    dotted_percentage: int = 33,
+    dashed_percentage: int = 67,
 ):
     graph = nx.DiGraph()
 
@@ -93,7 +69,6 @@ def to_dot(
                 graph.add_edge(start, end)
                 if m.group(2) == "=":
                     graph.edges[start, end]['color'] = mixture_edge_color
-
 
     # Create a new graph that is rooted at the first node
     if root:
@@ -114,6 +89,25 @@ def to_dot(
             rerooted.nodes[node]["fillcolor"] = hypothetical_node_color
         elif node == root:
             rerooted.nodes[node]["color"] = root_color
+
+    # Read input file again to get the mixed nodes and their percentages
+    mixed_node = None
+    with open(stem_file) as f:
+        for line in f:
+            if m := re.match(r"Mixed Node\s(.*?)\s", line):
+                mixed_node = m.group(1)
+            elif m:= re.match(r"Mixed %ages: (.*)$", line):
+                for link in m.group(1).split():
+                    start, percentage = link.split("=")
+                    graph.edges[start, mixed_node]["label"] = percentage
+                    percentage_int = int(percentage[:-1])
+                    if percentage_int < dotted_percentage:
+                        style = "dotted"
+                    elif percentage_int < dashed_percentage:
+                        style = "dashed"
+                    else:
+                        style = "solid"
+                    graph.edges[start, mixed_node]["style"] = style
 
     # Write the graph to a .dot file
     nx.drawing.nx_pydot.write_dot(graph, dot_file)

@@ -26,6 +26,10 @@ Visualization of STEMMA phylogenetic output.
 
 STEMMA is a phylogenetic analysis tool for the study of textual traditions with contamination. 
 It is available here: https://github.com/stemmatic/stemma
+For more information about it, see Carlon's work:
+
+    Carlson, Stephen C. *The Text of Galatians and Its History*. Wissenschaftliche Untersuchungen Zum Neuen Testament 385. Tübingen: Mohr Siebeck, 2015.
+
 STEMMA input files can be generated from TEI XML using teiphy: https://github.com/jjmccollum/teiphy
 
 For more information see: 
@@ -61,25 +65,25 @@ This will create a .dot file which can be visualized using Graphviz like in thes
     dot -Tsvg <outputfile> -o <outputfile>.svg
     dot -Tpdf <outputfile> -o <outputfile>.pdf
 
-You can reroot the tree using the `--root` option:
+You can reroot the tree using the ``--root`` option:
 
 .. code-block:: bash
 
     stemmadot <stemfile> <outputfile> --root <root>
 
-The root will be colored red by default and you can specify the color of other nodes using the `--root-color` option:
+The root will be colored red by default and you can specify the color of other nodes using the ``--root-color`` option:
 
 .. code-block:: bash
 
     stemmadot <stemfile> <outputfile> --root <root> --root-color <color>
 
-Hypothetical nodes will be colored gray by default and you can specify the color of other nodes using the `--hypothetical-node-color` option:
+Hypothetical nodes will be colored gray by default and you can specify the color of other nodes using the ``--hypothetical-node-color`` option:
 
 .. code-block:: bash
 
     stemmadot <stemfile> <outputfile> --hypothetical-node-color <color>
 
-You can specify other colors for nodes by creating a `.toml` file with regex patterns as keys and the corresponding colors as values:
+You can specify other colors for nodes by creating a ``.toml`` file with regex patterns as keys and the corresponding colors as values. For example:
 
 .. code-block:: toml
 
@@ -95,14 +99,14 @@ You can specify other colors for nodes by creating a `.toml` file with regex pat
     1999K = "orange"
     2012K = "orange"
 
-This is given to stemmadot using the `--colors` option:
+This is given to stemmadot using the ``--colors`` option:
 
 .. code-block:: bash
 
     stemmadot <stemfile> <outputfile>
 
-Edges representing mixutre (i.e. or 'contamination') will be colored red by default and you can specify the color of other edges using the `--mixture-edge-color` option.
-Also, mixture with less than 33% will show in dotted lines and mixture with less than 66% will show in dashed lines. These can be changed with the `--dotted` and `--dashed` options respectively.
+Edges representing mixutre (i.e. or 'contamination') will be colored red by default and you can specify the color of other edges using the ``--mixture-edge-color`` option.
+Also, mixture with less than 33% will show in dotted lines and mixture with less than 66% will show in dashed lines. These can be changed with the ``--dotted`` and ``--dashed`` options respectively.
 
 .. end-quickstart
 
@@ -114,7 +118,9 @@ Credits
 Robert Turnbull
 For more information contact: <robert.turnbull@unimelb.edu.au>
 
-STEMMA was created by Stephen Carlson (Australian Catholic University).
+STEMMA was created by Stephen Carlson (Australian Catholic University). If you use it, please cite Carlson's work:
+
+    Carlson, Stephen C. *The Text of Galatians and Its History*. Wissenschaftliche Untersuchungen Zum Neuen Testament 385. Tübingen: Mohr Siebeck, 2015.
 
 Help for this project came from Peter Montoro.
 

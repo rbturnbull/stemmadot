@@ -4,7 +4,7 @@ stemmadot
 
 .. start-badges
 
-|testing badge| |coverage badge| |docs badge| |black badge| |torchapp badge|
+|testing badge| |coverage badge| |docs badge| |black badge|
 
 .. |testing badge| image:: https://github.com/rbturnbull/stemmadot/actions/workflows/testing.yml/badge.svg
     :target: https://github.com/rbturnbull/stemmadot/actions
@@ -18,9 +18,6 @@ stemmadot
 .. |coverage badge| image:: https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/rbturnbull/7e847e177b0b427bfb0fe89bd2f6be5a/raw/coverage-badge.json
     :target: https://rbturnbull.github.io/stemmadot/coverage/
 
-.. |torchapp badge| image:: https://img.shields.io/badge/MLOpps-torchapp-B1230A.svg
-    :target: https://rbturnbull.github.io/torchapp/
-    
 .. end-badges
 
 .. start-quickstart
@@ -101,6 +98,7 @@ This is given to stemmadot using the `--colors` option:
 Edges representing mixutre (i.e. or 'contamination') will be colored red by default and you can specify the color of other edges using the `--mixture-edge-color` option.
 Also, mixture with less than 33% will show in dotted lines and mixture with less than 66% will show in dashed lines. These can be changed with the `--dotted` and `--dashed` options respectively.
 
+.. end-quickstart
 
 Credits
 ==================================

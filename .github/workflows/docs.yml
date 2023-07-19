@@ -56,9 +56,12 @@ jobs:
         poetry run coverage html --directory gh-pages/coverage
         rm -f gh-pages/coverage/.gitignore
     - name: Upload artifact
-      uses: actions/upload-pages-artifact@v1
+      uses: actions/upload-pages-artifact@v2
       with:
         path: gh-pages
+    - name: Deploy to GitHub Pages
+      id: deployment
+      uses: actions/deploy-pages@v2
     - name: Create Coverage Badge
       uses: schneegans/dynamic-badges-action@v1.1.0
       with:
@@ -68,3 +71,4 @@ jobs:
         label: coverage
         message: ${{ env.COVERAGE }}
         color: green
+

@@ -2,9 +2,10 @@ from pathlib import Path
 import typer
 import re
 import networkx as nx
+import json
+import tomli
 
 app = typer.Typer()
-
 
 def reroot_inward(node, source, output, visited=None):
     visited = visited or []
@@ -55,6 +56,7 @@ def to_dot(
     mixture_edge_color: str = "red",
     root_color: str = "red",
     hypothetical_node_color: str = "gray",
+    colors: Path = None,
     dotted_percentage: int = 33,
     dashed_percentage: int = 67,
 ):
@@ -77,18 +79,33 @@ def to_dot(
         reroot_outward(root, graph, rerooted)    
         graph = rerooted    
 
-    # TODO Colorize the nodes
+    # Parse colors file
+    colors_dict = {}
+    if colors:
+        with open(colors, 'rb') as f:
+            if colors.suffix == ".json":
+                colors_dict = json.load(f)
+            elif colors.suffix == ".toml":
+                colors_dict = tomli.load(f)
+            else:
+                raise Exception("Unknown file type for colors file.")
+
+    # Colorize the nodes
     for node in graph.nodes:
-        rerooted.nodes[node]["label"] = node                            
+        graph.nodes[node]["label"] = node                            
         if node.startswith("["):
-            rerooted.nodes[node]["color"] = hypothetical_node_color
-            rerooted.nodes[node]["label"] = ""    
-            rerooted.nodes[node]["shape"] = "circle"
-            rerooted.nodes[node]["fixedsize"] = "true"
-            rerooted.nodes[node]["style"] = "filled"
-            rerooted.nodes[node]["fillcolor"] = hypothetical_node_color
+            graph.nodes[node]["color"] = hypothetical_node_color
+            graph.nodes[node]["label"] = ""    
+            graph.nodes[node]["shape"] = "circle"
+            graph.nodes[node]["fixedsize"] = "true"
+            graph.nodes[node]["style"] = "filled"
+            graph.nodes[node]["fillcolor"] = hypothetical_node_color
         elif node == root:
-            rerooted.nodes[node]["color"] = root_color
+            graph.nodes[node]["color"] = root_color
+
+        for pattern, color in colors_dict.items():
+            if re.match(pattern, node):
+                graph.nodes[node]["color"] = color
 
     # Read input file again to get the mixed nodes and their percentages
     mixed_node = None

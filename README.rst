@@ -26,7 +26,7 @@ Visualization of STEMMA phylogenetic output.
 
 STEMMA is a phylogenetic analysis tool for the study of textual traditions with contamination. 
 It is available here: https://github.com/stemmatic/stemma
-For more information about it, see Carlon's work:
+For more information about it, see Carslon's work:
 
     Carlson, Stephen C. *The Text of Galatians and Its History*. Wissenschaftliche Untersuchungen Zum Neuen Testament 385. Tübingen: Mohr Siebeck, 2015.
 

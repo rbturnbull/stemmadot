@@ -70,8 +70,8 @@ def to_dot(
     with open(stem_file) as f:
         for line in f:
             if m := re.match(r"Link: (.*?) ([-=])> (.*?)\s+\|", line):
-                start = m.group(1)
-                end = m.group(3)
+                start = m.group(1).split(" ")[0]
+                end = m.group(3).split(" ")[0]
                 graph.add_edge(start, end)
                 if m.group(2) == "=":
                     graph.edges[start, end]['color'] = mixture_edge_color

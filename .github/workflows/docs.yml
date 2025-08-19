@@ -1,23 +1,15 @@
 name: docs
 
 on:
-  # Runs on pushes targeting the default branch
   push:
-    branches: main
-      
-  # Allows you to run this workflow manually from the Actions tab
+    branches: [main]
   workflow_dispatch:
 
-
-# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
 permissions:
   contents: read
   pages: write
   id-token: write
 
-
-# Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
-# However, do NOT cancel in-progress runs as we want to allow these production deployments to complete.
 concurrency:
   group: "pages"
   cancel-in-progress: false
@@ -28,40 +20,55 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.9"]
+        python-version: ["3.11"]
     steps:
     - uses: actions/checkout@v3
-    - name: Setup Pages
-      uses: actions/configure-pages@v3
-    - name: Install poetry
-      run: pipx install poetry
-    - name: Install poetry
-      run: pipx install poetry
+
     - name: Initialise Python ${{ matrix.python-version }}
       uses: actions/setup-python@v3
       with:
         python-version: ${{ matrix.python-version }}
-        cache: "poetry"
-    - name: Install dependencies for Python ${{ matrix.python-version }}
+
+    - name: Install poetry
+      run: pipx install poetry
+
+    - name: Setup Graphviz
+      uses: ts-graphviz/setup-graphviz@v1
+            
+    - name: Cache Poetry packages
+      uses: actions/cache@v3
+      with:
+        path: ~/.cache/pypoetry
+        key: ${{ runner.os }}-poetry-${{ matrix.python-version }}
+        restore-keys: |
+          ${{ runner.os }}-poetry-
+
+    - name: Install dependencies
       run: |
         poetry env use "${{ matrix.python-version }}"
         poetry install
-    - name: Docs
-      run: |
-        poetry run sphinx-build -b html docs gh-pages
-    - name: Coverage
+
+    - name: Build Sphinx docs
+      run: poetry run sphinx-build -b html docs gh-pages
+
+    - name: Run tests and generate coverage report
       run: |
         poetry run coverage run -m pytest
         echo "COVERAGE=$(poetry run coverage report --precision 2 | grep TOTAL | tr -s ' ' | cut -f 4 -d " ")" >> $GITHUB_ENV
         poetry run coverage html --directory gh-pages/coverage
-        rm -f gh-pages/coverage/.gitignore
+
+    - name: Setup Pages
+      uses: actions/configure-pages@v3
+
     - name: Upload artifact
-      uses: actions/upload-pages-artifact@v2
+      uses: actions/upload-pages-artifact@v3
       with:
-        path: gh-pages
+        path: 'gh-pages'
+
     - name: Deploy to GitHub Pages
       id: deployment
-      uses: actions/deploy-pages@v2
+      uses: actions/deploy-pages@v4
+
     - name: Create Coverage Badge
       uses: schneegans/dynamic-badges-action@v1.1.0
       with:
@@ -71,4 +78,3 @@ jobs:
         label: coverage
         message: ${{ env.COVERAGE }}
         color: green
-

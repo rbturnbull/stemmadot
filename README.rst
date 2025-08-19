@@ -57,13 +57,7 @@ Then run stemmadot:
 
     stemmadot <stemfile> <outputfile>
 
-This will create a .dot file which can be visualized using Graphviz like in these examples:
-
-.. code-block:: bash
-
-    dot -Tpng <outputfile> -o <outputfile>.png
-    dot -Tsvg <outputfile> -o <outputfile>.svg
-    dot -Tpdf <outputfile> -o <outputfile>.pdf
+The output file can have one of the following extensions: `.dot`, `.png`, `.pdf`, `.svg`, `.jpg`, `.jpeg`
 
 You can reroot the tree using the ``--root`` option:
 

@@ -7,6 +7,12 @@ import tomli
 
 app = typer.Typer()
 
+def clean_name(name: str) -> str:
+    """Clean the node name by removing any trailing punctuation."""
+    if ":" in name:
+        name = f'"{name}"'
+    return name.strip()
+
 def reroot_inward(node, source, output, visited=None):
     visited = visited or []
     visited.append(node)
@@ -55,7 +61,7 @@ def reroot_outward(node, source, output, visited=None):
 @app.command()
 def to_dot(
     stem_file: Path, 
-    dot_file:Path, 
+    output_file:Path, 
     root: str = None,
     mixture_edge_color: str = "red",
     root_color: str = "red",
@@ -70,8 +76,9 @@ def to_dot(
     with open(stem_file) as f:
         for line in f:
             if m := re.match(r"Link: (.*?) ([-=])> (.*?)\s+\|", line):
-                start = m.group(1).split(" ")[0]
-                end = m.group(3).split(" ")[0]
+                start = clean_name(m.group(1).split(" ")[0])
+                end = clean_name(m.group(3).split(" ")[0])
+
                 graph.add_edge(start, end)
                 if m.group(2) == "=":
                     graph.edges[start, end]['color'] = mixture_edge_color
@@ -139,4 +146,21 @@ def to_dot(
                 break # only use first match
 
     # Write the graph to a .dot file
-    nx.drawing.nx_pydot.write_dot(graph, dot_file)
+    output_file.parent.mkdir(parents=True, exist_ok=True)
+    suffix = output_file.suffix.lower()
+    if suffix == ".dot":
+        nx.drawing.nx_pydot.write_dot(graph, output_file)
+    else:
+        pdg = nx.drawing.nx_pydot.to_pydot(graph)
+
+        if suffix == ".png":
+            pdg.write_png(str(output_file))
+        elif suffix == ".pdf":
+            pdg.write_pdf(str(output_file))
+        elif suffix == ".svg":
+            pdg.write_svg(str(output_file))
+        elif suffix in (".jpg", ".jpeg"):
+            pdg.write_jpg(str(output_file))
+        else:
+            raise ValueError(f"Unsupported extension '{suffix}'. Use one of: .dot, .png, .pdf, .svg, .jpg, .jpeg")
+

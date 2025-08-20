@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "stemmadot"
-version = "0.2.0"
+version = "0.3.0"
 description = "Visualization of STEMMA phylogenetic output."
 authors = ["Robert Turnbull <robert.turnbull@unimelb.edu.au>"]
 license = "Apache-2.0"
@@ -17,11 +17,12 @@ classifiers = [
 ]
 
 [tool.poetry.dependencies]
-python = ">=3.8,<4.0"
+python = ">=3.10,<4.0"
 typer = ">=0.4.0"
 networkx = ">=3.1"
 pydot = ">=1.4.2"
 tomli = ">=1.0.0"
+pygraphviz = ">=1.14"
 
 [tool.poetry.group.dev.dependencies]
 pytest = ">=6.2.5"

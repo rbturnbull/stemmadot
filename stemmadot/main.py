@@ -4,6 +4,7 @@ import re
 import networkx as nx
 import json
 import tomli
+from networkx.drawing import nx_agraph
 
 app = typer.Typer()
 
@@ -69,6 +70,7 @@ def to_dot(
     colors: Path = None,
     dotted: int = 33,
     dashed: int = 67,
+    engine: str = "dot",
 ):
     graph = nx.DiGraph()
 
@@ -147,20 +149,37 @@ def to_dot(
 
     # Write the graph to a .dot file
     output_file.parent.mkdir(parents=True, exist_ok=True)
-    suffix = output_file.suffix.lower()
-    if suffix == ".dot":
-        nx.drawing.nx_pydot.write_dot(graph, output_file)
-    else:
-        pdg = nx.drawing.nx_pydot.to_pydot(graph)
+    output_file.parent.mkdir(parents=True, exist_ok=True)
+    A = nx_agraph.to_agraph(graph)
 
-        if suffix == ".png":
-            pdg.write_png(str(output_file))
-        elif suffix == ".pdf":
-            pdg.write_pdf(str(output_file))
-        elif suffix == ".svg":
-            pdg.write_svg(str(output_file))
-        elif suffix in (".jpg", ".jpeg"):
-            pdg.write_jpg(str(output_file))
-        else:
-            raise ValueError(f"Unsupported extension '{suffix}'. Use one of: .dot, .png, .pdf, .svg, .jpg, .jpeg")
+    # Global layout knobs
+    if engine == "dot":  # great for DAGs
+        A.graph_attr.update(
+            ranksep="1.2 equally",  # more vertical space between ranks
+            nodesep="0.5",          # more space between nodes in same rank
+            splines="spline",
+            concentrate="true",
+            dpi="200",
+        )
+    elif engine in {"sfdp", "neato", "fdp"}:
+        A.graph_attr.update(
+            overlap="false",  # avoid node overlaps
+            sep="+2",         # padding between nodes (points)
+            splines="spline",
+            dpi="200",
+        )
+        if engine in {"neato", "fdp"}:
+            A.graph_attr.update(K="1.2")  # spread out a bit more
+
+    # Default node/edge cosmetics (optional)
+    A.node_attr.update(shape="ellipse", fontsize="20")
+    A.edge_attr.update(penwidth="1.2")
+
+    fmt = output_file.suffix.lower().lstrip(".")
+    # Map jpg -> jpg
+    if fmt == "jpeg": fmt = "jpg"
+
+    # Choose engine program and render
+    prog = engine  # "dot", "sfdp", "neato", or "fdp"
+    A.draw(str(output_file), format=fmt, prog=prog)
 

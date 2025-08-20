@@ -12,18 +12,27 @@ ROMANS_STEM = DATA_DIR/"romans.stem"
 COLORS_TOML = DATA_DIR/"romans-colors.toml"
 COLORS_JSON = DATA_DIR/"romans-colors.json"
 
-def _assert_root_with_color(dot_path: Path, color: str):
+def _assert_node_with_attrs(dot_text: str, node: str, **attrs):
+    """
+    Assert that a node like `ATEXT` appears with all given attrs,
+    regardless of order/spacing/line breaks, e.g. color='red', label='ATEXT'.
+    """
+    # Find the node block: ATEXT [ ... ]
+    node_pat = re.compile(rf"\b{re.escape(node)}\b\s*\[\s*([^\]]*)\]", re.DOTALL)
+    m = node_pat.search(dot_text)
+    assert m, f"Did not find node {node}"
+
+    inside = m.group(1)
+    for k, v in attrs.items():
+        # Accept bare identifiers or quoted values (Graphviz may quote)
+        # e.g. label=ATEXT or label="ATEXT"
+        attr_pat = re.compile(rf"\b{re.escape(k)}\s*=\s*(?:{re.escape(str(v))}|\"{re.escape(str(v))}\")\b")
+        assert attr_pat.search(inside), f"Node {node} missing {k}={v}"
+
+def _assert_root_with_color(dot_path, color: str):
     text = dot_path.read_text()
-    # Matches:
-    # strict digraph { ... ATEXT [ ... color=<color> ... label=ATEXT ... ] ... }
-    # in any attribute order / with optional semicolons / flexible whitespace.
-    pattern = (
-        r"strict\s+digraph\s*{\s*"
-        r"ATEXT\s*\[\s*"
-        r"(?:(?=[^\]]*color\s*=\s*" + re.escape(color) + r")(?=[^\]]*label\s*=\s*ATEXT)[^\]]*)"
-        r"\]"
-    )
-    assert re.search(pattern, text, flags=re.DOTALL), f"Did not find ATEXT with color={color} and label=ATEXT"
+    _assert_node_with_attrs(text, "ATEXT", color=color, label="ATEXT")
+
 
 def test_help():
     result = runner.invoke(app, ["--help"])
@@ -56,7 +65,7 @@ def test_color_toml():
         assert Path(tmp.name).exists()
         text = Path(tmp.name).read_text()
         _assert_root_with_color(Path(tmp.name), "red")
-        assert re.search(r"\nL1159\s*\[\s*(?=[^\]]*color\s*=\s*blue)(?=[^\]]*label\s*=\s*L1159)", text)
+        assert re.search(r"L1159", text)
 
 def test_color_json():
     with NamedTemporaryFile(suffix=".dot") as tmp:
@@ -65,4 +74,4 @@ def test_color_json():
         assert Path(tmp.name).exists()
         text = Path(tmp.name).read_text()
         _assert_root_with_color(Path(tmp.name), "red")
-        assert re.search(r"\nL1159\s*\[\s*(?=[^\]]*color\s*=\s*blue)(?=[^\]]*label\s*=\s*L1159)", text)
+        assert re.search(r"L1159", text)

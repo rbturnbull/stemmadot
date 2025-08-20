@@ -97,10 +97,11 @@ def to_dot(
     with open(stem_file) as f:
         for line in f:
             if m := re.match(r"Mixed Node\s(.*?)\s", line):
-                mixed_node = m.group(1)
-            elif m:= re.match(r"Mixed %ages: (.*)$", line):
-                for link in m.group(1).split():
-                    start, percentage = link.split("=")
+                mixed_node = clean_name(m.group(1))
+            if mixed_node:
+                if m := re.match(r"\s+\d+\s(.*?)\s*: --->\s*\d+\s+(\d+)%", line):
+                    start = clean_name(m.group(1))
+                    percentage = m.group(2) + "%"
                     edge = (start, mixed_node)
                     if not edge in graph.edges:
                         edge = (mixed_node, start)
@@ -109,6 +110,9 @@ def to_dot(
                         raise Exception(f"edge not found: {start} {mixed_node}")
 
                     graph.edges[edge]["label"] = percentage
+                    graph.edges[edge]["fontcolor"] = mixture_edge_color
+
+                    # Determine the style based on the percentage
                     percentage_int = int(percentage[:-1])
                     if percentage_int < dotted:
                         style = "dotted"
@@ -149,16 +153,15 @@ def to_dot(
 
     # Write the graph to a .dot file
     output_file.parent.mkdir(parents=True, exist_ok=True)
-    output_file.parent.mkdir(parents=True, exist_ok=True)
     A = nx_agraph.to_agraph(graph)
 
     # Global layout knobs
     if engine == "dot":  # great for DAGs
         A.graph_attr.update(
-            ranksep="1.2 equally",  # more vertical space between ranks
-            nodesep="0.5",          # more space between nodes in same rank
+            ranksep="1.5 equally",  # more vertical space between ranks
+            # nodesep="0.5",          # more space between nodes in same rank
             splines="spline",
-            concentrate="true",
+            # concentrate="true",
             dpi="200",
         )
     elif engine in {"sfdp", "neato", "fdp"}:
